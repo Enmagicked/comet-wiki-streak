@@ -13,21 +13,63 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
     setLoading(true);
-    const { error } = mode === "in"
-      ? await supabase.auth.signInWithPassword({ email, password })
-      : await supabase.auth.signUp({
-          email, password,
-          options: { emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined },
-        });
+
+    if (mode === "in") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading(false);
+      if (error) { setErr(error.message); return; }
+      router.push("/dashboard");
+      router.refresh();
+      return;
+    }
+
+    // sign up
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined },
+    });
     setLoading(false);
     if (error) { setErr(error.message); return; }
+
+    // If email confirmation is required, Supabase returns a user but no session.
+    if (data.user && !data.session) {
+      setEmailSent(true);
+      return;
+    }
+    // Otherwise we're signed in immediately.
     router.push("/dashboard");
     router.refresh();
+  }
+
+  if (emailSent) {
+    return (
+      <main className="relative flex-1 min-h-screen flex items-center justify-center px-6">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-midnight)_0%,_var(--color-night)_70%)]" />
+          <Stars density={140} />
+        </div>
+        <div className="w-full max-w-sm rounded-2xl border border-cloud-deep/30 bg-midnight/60 backdrop-blur-md p-8 text-center">
+          <div className="text-4xl mb-4">✉️</div>
+          <h1 className="font-display text-2xl mb-3">Check your inbox.</h1>
+          <p className="text-cloud text-sm mb-6">
+            We sent a verification link to <span className="text-star">{email}</span>.
+            Click it to confirm your account, then sign in. (Check spam if it&apos;s not there in a minute.)
+          </p>
+          <button
+            onClick={() => { setEmailSent(false); setMode("in"); }}
+            className="text-sm text-cloud-deep hover:text-cloud transition-colors"
+          >
+            ← back to sign in
+          </button>
+        </div>
+      </main>
+    );
   }
 
   return (
