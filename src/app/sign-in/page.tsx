@@ -34,7 +34,7 @@ export default function SignIn() {
         <Stars density={140} />
       </div>
       <div className="w-full max-w-sm rounded-2xl border border-cloud-deep/30 bg-midnight/60 backdrop-blur-md p-8">
-        <Link href="/" className="block text-cloud-deep text-xs uppercase tracking-widest font-mono mb-6">← wiki streak</Link>
+        <Link href="/" className="block text-cloud-deep text-xs uppercase tracking-widest font-mono mb-6">← comet</Link>
         <h1 className="font-display text-3xl mb-2">{mode === "in" ? "Welcome back." : "Begin your streak."}</h1>
         <p className="text-cloud text-sm mb-6">{mode === "in" ? "Sign in to keep the streak alive." : "Five minutes a day, drifting through everything humans know."}</p>
         <form onSubmit={submit} className="space-y-3">

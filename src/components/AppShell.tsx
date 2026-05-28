@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <header className="border-b border-cloud-deep/20 backdrop-blur-md bg-night/50 sticky top-0 z-20">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/dashboard" className="font-display text-lg tracking-tight">wiki streak</Link>
+          <Link href="/dashboard" className="font-display text-lg tracking-tight">comet</Link>
           <nav className="flex items-center gap-1">
             {tabs.map((t) => {
               const active = path === t.href || path.startsWith(t.href + "/");
