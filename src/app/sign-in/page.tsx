@@ -1,9 +1,18 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Stars } from "@/components/Stars";
+
+const WIKI_ERRORS: Record<string, string> = {
+  wiki_not_configured: "Wikipedia login isn't configured yet.",
+  wiki_state: "Wikipedia sign-in expired or was tampered with. Try again.",
+  wiki_token: "Couldn't complete the Wikipedia handshake. Try again.",
+  wiki_profile: "Couldn't read your Wikipedia profile. Try again.",
+  wiki_user: "Couldn't set up your account. Try again.",
+  wiki_session: "Couldn't start your session. Try again.",
+};
 
 export default function SignIn() {
   const router = useRouter();
@@ -14,6 +23,11 @@ export default function SignIn() {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("error");
+    if (code && WIKI_ERRORS[code]) setErr(WIKI_ERRORS[code]);
+  }, []);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -101,6 +115,23 @@ export default function SignIn() {
             {loading ? "…" : mode === "in" ? "Sign in" : "Create account"}
           </button>
         </form>
+
+        <div className="flex items-center gap-3 my-5">
+          <div className="h-px flex-1 bg-cloud-deep/20" />
+          <span className="text-cloud-deep text-xs uppercase tracking-widest font-mono">or</span>
+          <div className="h-px flex-1 bg-cloud-deep/20" />
+        </div>
+
+        <a
+          href="/api/auth/wikipedia/login"
+          className="w-full flex items-center justify-center gap-2 border border-cloud-deep/40 rounded-lg py-3 text-star hover:border-cloud hover:bg-night/40 transition-colors"
+        >
+          <svg viewBox="0 0 24 24" className="w-5 h-5 fill-star" aria-hidden>
+            <path d="M21.6 6.2h-5.1v.6c.7.05 1.2.2 1.4.45.2.25.15.7-.15 1.4l-2.7 6-2.5-5.8c-.3-.7-.35-1.2-.1-1.5.2-.3.7-.45 1.4-.5v-.6H8.1v.6c.5.05.85.2 1.1.45.25.25.5.7.8 1.4l.5 1.1-2 4.4-2.5-5.9c-.3-.7-.3-1.15-.05-1.4.25-.25.65-.4 1.2-.45v-.6H2.4v.6c.45.05.8.2 1.05.5.25.3.55.85.85 1.6l3.6 8.5h.65l2.5-5.4 2.35 5.4h.65l3.7-8.4c.35-.8.7-1.35 1-1.65.3-.3.65-.45 1.05-.5v-.6Z" />
+          </svg>
+          Continue with Wikipedia
+        </a>
+
         <button
           onClick={() => setMode((m) => (m === "in" ? "up" : "in"))}
           className="mt-6 text-sm text-cloud-deep hover:text-cloud transition-colors w-full text-center"
