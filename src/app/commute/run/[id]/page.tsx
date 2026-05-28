@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 import { CommuteQueuePlayer } from "@/components/commute/CommuteQueuePlayer";
 
+export const dynamic = "force-dynamic";
+
 type QueueItem = { title: string; pageid: number; est_minutes: number; extract?: string };
 
 export default async function RunPage(props: PageProps<"/commute/run/[id]">) {

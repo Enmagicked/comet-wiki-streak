@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { StreakRing } from "@/components/dashboard/StreakRing";
 import { Heatmap } from "@/components/dashboard/Heatmap";
 import { TimeSeries } from "@/components/dashboard/TimeSeries";
