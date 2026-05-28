@@ -26,11 +26,15 @@ export default function Settings() {
     })();
   }, [supabase]);
 
+  const [err, setErr] = useState<string | null>(null);
   async function save() {
-    setSaved(false);
+    setSaved(false); setErr(null);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    await supabase.from("profiles").update({ daily_goal_min: goal, timezone: tz, display_name: name }).eq("id", user.id);
+    if (!user) { setErr("Not signed in."); return; }
+    const { error } = await supabase
+      .from("profiles")
+      .upsert({ id: user.id, daily_goal_min: goal, timezone: tz, display_name: name }, { onConflict: "id" });
+    if (error) { setErr(error.message); return; }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -54,9 +58,12 @@ export default function Settings() {
           <div className="text-cloud-deep text-xs mt-2">Used to bucket your reading into local days for the streak.</div>
         </Field>
 
-        <button onClick={save} className="bg-star text-night font-medium rounded-full px-6 py-3 hover:bg-moon transition-colors">
-          {saved ? "Saved ✓" : "Save"}
-        </button>
+        <div className="flex items-center gap-4">
+          <button onClick={save} className="bg-star text-night font-medium rounded-full px-6 py-3 hover:bg-moon transition-colors">
+            {saved ? "Saved ✓" : "Save"}
+          </button>
+          {err && <span className="text-red-300 text-sm">{err}</span>}
+        </div>
       </div>
     </main>
   );
