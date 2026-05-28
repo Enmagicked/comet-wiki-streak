@@ -20,7 +20,10 @@ export default function SignIn() {
     setLoading(true);
     const { error } = mode === "in"
       ? await supabase.auth.signInWithPassword({ email, password })
-      : await supabase.auth.signUp({ email, password });
+      : await supabase.auth.signUp({
+          email, password,
+          options: { emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined },
+        });
     setLoading(false);
     if (error) { setErr(error.message); return; }
     router.push("/dashboard");
